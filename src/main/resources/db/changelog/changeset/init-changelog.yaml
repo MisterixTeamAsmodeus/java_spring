@@ -1,0 +1,84 @@
+databaseChangeLog:
+  - changeSet:
+      id: init-1
+      author: Alex
+      changes:
+        - createTable:
+            tableName: employee
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: init-2
+      author: Alex
+      changes:
+        - createTable:
+            tableName: task
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: init-3
+      author: Alex
+      changes:
+        - createTable:
+            tableName: task_employee
+            columns:
+              - column:
+                  name: employee_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: task_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+  - changeSet:
+      id: init-4
+      author: Alex
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: task_employee
+            baseColumnNames: employee_id
+            constraintName: fk_id_on_employee_id
+            referencedTableName: employee
+            referencedColumnNames: id
+  - changeSet:
+      id: init-5
+      author: Alex
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: task_employee
+            baseColumnNames: task_id
+            constraintName: fk_id_on_task_id
+            referencedColumnNames: id
+            referencedTableName: task
+
