@@ -1,0 +1,9 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  application.name: java-spring
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/postgres"
+    username: service
+    password: service

@@ -1,0 +1,19 @@
+services:
+  pgdb:
+    image: postgres:15.4-alpine3.18
+    environment:
+      POSTGRES_USER: service
+      POSTGRES_PASSWORD: service
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U service -d service'" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  postgres_data:
