@@ -13,9 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,6 @@ public class TaskService {
     private final TaskMapper taskMapper;
 
     private final EmployeeMapper employeeMapper;
-
     private final EmployeeRepository employeeRepository;
 
     @Transactional
@@ -36,8 +36,19 @@ public class TaskService {
 
     @Transactional
     public Optional<TaskResponseDto> addEmployeeToTask(Long id, Long employeeId) {
-        //TODO write implementation
-        return Optional.empty();
+        var task = taskRepository.findById(id);
+        var employee = employeeRepository.findById(employeeId);
+
+        if(task.isEmpty() || employee.isEmpty()) {
+            return Optional.empty();
+        }
+
+        task.get().addEmployee(employee.get());
+
+        taskRepository.save(task.get());
+        employeeRepository.save(employee.get());
+
+        return Optional.ofNullable(taskMapper.toDto(task.get()));
     }
 
     @Transactional
@@ -47,15 +58,16 @@ public class TaskService {
 
     @Transactional
     public Page<TaskResponseDto> getAllTasks(Pageable pageable) {
-        return taskRepository
-                .findAll(pageable)
-                .map(taskMapper::toDto);
+        return taskRepository.findAll(pageable).map(taskMapper::toDto);
     }
 
     @Transactional
-    public List<EmployeeResponseDto> getEmployeeOnTask(Long id) {
-        //TODO write implementation
-        return new ArrayList<>();
+    public Set<EmployeeResponseDto> getEmployeeOnTask(Long id) {
+        return taskRepository.findById(id).map(value -> value.getEmployees()
+                        .stream()
+                        .map(employeeMapper::toDto)
+                        .collect(Collectors.toSet()))
+                .orElseGet(HashSet::new);
     }
 
     @Transactional
@@ -66,9 +78,7 @@ public class TaskService {
         var task = taskMapper.fromDto(requestDto);
         task.setId(id);
 
-        return Optional.ofNullable(
-                taskMapper.toDto(
-                        taskRepository.save(task)));
+        return Optional.ofNullable(taskMapper.toDto(taskRepository.save(task)));
     }
 
     @Transactional
@@ -82,7 +92,16 @@ public class TaskService {
 
     @Transactional
     public boolean deleteEmployeeFromTask(Long id, Long employeeId) {
-        //TODO write implementation
-        return false;
+        var task = taskRepository.findById(id);
+
+        if(task.isEmpty()){
+            return false;
+        }
+
+        var isSuccessful = task.get().removeEmployee(employeeId);
+
+        taskRepository.save(task.get());
+
+        return isSuccessful;
     }
 }

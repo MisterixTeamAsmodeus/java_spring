@@ -29,6 +29,18 @@ public class Employee {
     )
     private Set<Task> tasks = new HashSet<>();
 
+    public boolean removeTask(Long id) {
+        var task = this.tasks.stream().filter(t -> Objects.equals(t.getId(), id)).findFirst().orElse(null);
+
+        return task != null && tasks.remove(task) && task.getEmployees().remove(this);
+    }
+
+    public void addTask(Task task){
+        this.tasks.add(task);
+        task.getEmployees().add(this);
+    }
+
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

@@ -9,7 +9,6 @@ public class Application {
         SpringApplication.run(Application.class, args);
 
         //TODO
-        // реализовать api для создания many to many
         // тесты потыкать
     }
 }

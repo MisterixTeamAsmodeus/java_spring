@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/task")
@@ -47,7 +47,7 @@ public class TaskController {
     }
 
     @GetMapping("/get-employee-on-task/{id}")
-    public ResponseEntity<List<EmployeeResponseDto>> getEmployeeOnTask(@PathVariable Long id) {
+    public ResponseEntity<Set<EmployeeResponseDto>> getEmployeeOnTask(@PathVariable Long id) {
         return ResponseEntity.ok(service.getEmployeeOnTask(id));
     }
 

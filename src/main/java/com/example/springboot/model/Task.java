@@ -5,9 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,6 +28,17 @@ public class Task {
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             mappedBy = "tasks")
     private Set<Employee> employees = new HashSet<>();
+
+    public boolean removeEmployee(Long id) {
+        Employee employee = this.employees.stream().filter(t -> Objects.equals(t.getId(), id)).findFirst().orElse(null);
+
+        return employee != null && employees.remove(employee) && employee.getTasks().remove(this);
+    }
+
+    public void addEmployee(Employee employee){
+        this.employees.add(employee);
+        employee.getTasks().add(this);
+    }
 
     @Override
     public final boolean equals(Object o) {
