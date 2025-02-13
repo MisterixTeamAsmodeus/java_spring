@@ -9,5 +9,5 @@ import java.io.Serializable;
  * DTO for {@link com.example.springboot.model.Task}
  */
 public record TaskRequestDto(@NotNull @NotEmpty String title,
-                             @NotEmpty String description) implements Serializable {
+                              String description) implements Serializable {
 }

@@ -4,7 +4,11 @@ import com.example.springboot.dto.EmployeeResponseDto;
 import com.example.springboot.dto.TaskRequestDto;
 import com.example.springboot.dto.TaskResponseDto;
 import com.example.springboot.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +21,8 @@ import java.util.List;
 public class TaskController {
     private final TaskService service;
 
-    @PostMapping("/add")
-    public ResponseEntity<TaskResponseDto> addTask(@RequestBody TaskRequestDto requestDto) {
+    @PostMapping("/")
+    public ResponseEntity<TaskResponseDto> addTask(@Valid @RequestBody TaskRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.addTask(requestDto));
     }
@@ -30,16 +34,16 @@ public class TaskController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<TaskResponseDto> getTaskById(@PathVariable Long id) {
         return service.getTaskById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<List<TaskResponseDto>> getAllTasks() {
-        return ResponseEntity.ok(service.getAllTasks());
+    @GetMapping("/")
+    public Page<TaskResponseDto> getAllTasks(@ParameterObject Pageable pageable) {
+        return service.getAllTasks(pageable);
     }
 
     @GetMapping("/get-employee-on-task/{id}")
@@ -47,14 +51,14 @@ public class TaskController {
         return ResponseEntity.ok(service.getEmployeeOnTask(id));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskRequestDto requestDto) {
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @Valid @RequestBody TaskRequestDto requestDto) {
         return service.updateTask(id, requestDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         return service.deleteTask(id)
                 ? ResponseEntity.noContent().build()
@@ -67,4 +71,5 @@ public class TaskController {
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
+
 }

@@ -10,5 +10,5 @@ import java.io.Serializable;
  */
 public record TaskResponseDto(@NotNull Long id,
                               @NotNull @NotEmpty String title,
-                              @NotEmpty String description) implements Serializable {
+                              String description) implements Serializable {
 }

@@ -3,11 +3,13 @@ package com.example.springboot.service;
 import com.example.springboot.dto.EmployeeRequestDto;
 import com.example.springboot.dto.EmployeeResponseDto;
 import com.example.springboot.dto.TaskResponseDto;
-import com.example.springboot.mapper.EmployeeRequestMapper;
-import com.example.springboot.mapper.EmployeeResponseMapper;
+import com.example.springboot.mapper.EmployeeMapper;
 import com.example.springboot.repo.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,38 +19,41 @@ import java.util.Optional;
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
 
-    private final EmployeeRequestMapper employeeRequestMapper;
-    private final EmployeeResponseMapper employeeResponseMapper;
+    private final EmployeeMapper employeeMapper;
 
+    @Transactional
     public EmployeeResponseDto addEmployee(EmployeeRequestDto requestDto) {
-        var employee = employeeRequestMapper.fromDto(requestDto);
+        var employee = employeeMapper.fromDto(requestDto);
         employee = employeeRepository.save(employee);
-        return employeeResponseMapper.toDto(employee);
+        return employeeMapper.toDto(employee);
     }
 
+    @Transactional
     public Optional<EmployeeResponseDto> getEmployeeById(Long id) {
-        return employeeRepository.findById(id).map(employeeResponseMapper::toDto);
+        return employeeRepository.findById(id).map(employeeMapper::toDto);
     }
 
-    public List<EmployeeResponseDto> getAllEmployers() {
-        return employeeRepository.findAll()
-                .stream()
-                .map(employeeResponseMapper::toDto)
-                .toList();
+    @Transactional
+    public Page<EmployeeResponseDto> getAllEmployers(Pageable pageable) {
+        return employeeRepository
+                .findAll(pageable)
+                .map(employeeMapper::toDto);
     }
 
+    @Transactional
     public Optional<EmployeeResponseDto> updateEmployee(Long id, EmployeeRequestDto requestDto) {
         if (employeeRepository.findById(id).isEmpty())
             return Optional.empty();
 
-        var employee = employeeRequestMapper.fromDto(requestDto);
+        var employee = employeeMapper.fromDto(requestDto);
         employee.setId(id);
 
         return Optional.ofNullable(
-                employeeResponseMapper.toDto(
+                employeeMapper.toDto(
                         employeeRepository.save(employee)));
     }
 
+    @Transactional
     public boolean deleteEmployee(Long id) {
         var employee = employeeRepository.findById(id);
 
@@ -57,18 +62,23 @@ public class EmployeeService {
         return employee.isPresent();
     }
 
+    @Transactional
     public Optional<EmployeeResponseDto> addTaskToEmployee(Long id, Long taskId) {
         //TODO write implementation
         return Optional.empty();
     }
 
+    @Transactional
     public List<TaskResponseDto> getTaskOnEmployee(Long id) {
         //TODO write implementation
         return null;
     }
 
+    @Transactional
     public boolean deleteTaskFromEmployee(Long id, Long taskId) {
         //TODO write implementation
         return false;
     }
+
+
 }

@@ -5,6 +5,9 @@ import com.example.springboot.dto.EmployeeResponseDto;
 import com.example.springboot.dto.TaskResponseDto;
 import com.example.springboot.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +20,7 @@ import java.util.List;
 public class EmployeeController {
     private EmployeeService service;
 
-    @PostMapping("/add")
+    @PostMapping("/")
     public ResponseEntity<EmployeeResponseDto> addEmployee(@RequestBody EmployeeRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.addEmployee(requestDto));
@@ -30,16 +33,16 @@ public class EmployeeController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<EmployeeResponseDto> getEmployeeById(@PathVariable Long id) {
         return service.getEmployeeById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<List<EmployeeResponseDto>> getAllEmployers() {
-        return ResponseEntity.ok(service.getAllEmployers());
+    @GetMapping("/")
+    public Page<EmployeeResponseDto> getAll(@ParameterObject Pageable pageable) {
+        return service.getAllEmployers(pageable);
     }
 
     @GetMapping("/get-task-on-employee/{id}")
@@ -47,14 +50,14 @@ public class EmployeeController {
         return ResponseEntity.ok(service.getTaskOnEmployee(id));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<EmployeeResponseDto> updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequestDto requestDto) {
         return service.updateEmployee(id, requestDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         return service.deleteEmployee(id)
                 ? ResponseEntity.noContent().build()
